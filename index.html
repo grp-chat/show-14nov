@@ -1,0 +1,878 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coach Andrew's Stacking League</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --red: #e63950;
+  --red-dark: #a91f36;
+  --blue: #1676dc;
+  --blue-dark: #1052a0;
+  --ink: #192335;
+  --muted: #687487;
+  --line: #e5eaf1;
+  --paper: #ffffff;
+  --bg: #edf1f7;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Inter', Arial, sans-serif;
+  line-height: 1.65;
+}
+
+button { font: inherit; }
+
+.topbar {
+  background: #101a2a;
+  color: white;
+  padding: 12px 5%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  box-shadow: 0 3px 14px #0002;
+}
+
+.brand {
+  font-weight: 800;
+  letter-spacing: 1px;
+  font-size: 13px;
+}
+
+.brand span { color: #ff526b; }
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  border: 1px solid #ffffff30;
+  color: white;
+  background: #ffffff12;
+  border-radius: 7px;
+  padding: 8px 13px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  transition: .2s;
+}
+
+.btn:hover { background: #ffffff25; }
+
+.btn.editing {
+  background: #e63950;
+  border-color: #e63950;
+}
+
+.btn.print {
+  background: #1676dc;
+  border-color: #1676dc;
+}
+
+.hero {
+  background:
+    radial-gradient(circle at 15% 20%, #e6395040, transparent 35%),
+    radial-gradient(circle at 85% 80%, #1676dc45, transparent 35%),
+    #101a2a;
+  padding: 65px 20px 55px;
+  text-align: center;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  height: 5px;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(90deg,var(--red) 50%,var(--blue) 50%);
+}
+
+.hero .eyebrow {
+  font-size: 12px;
+  letter-spacing: 5px;
+  color: #b7c4d8;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.hero h1 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(38px, 8vw, 76px);
+  line-height: .95;
+  margin: 0;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.hero h1 .red { color: #ff526b; }
+.hero h1 .blue { color: #58a9ff; }
+
+.hero .subtitle {
+  margin: 19px 0 0;
+  font-size: 13px;
+  color: #d2dbea;
+  letter-spacing: 3px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.hero .tagline {
+  margin-top: 28px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 25px;
+  font-weight: 800;
+  letter-spacing: 5px;
+}
+
+.hero .tagline span:first-child { color: #ff526b; }
+.hero .tagline span:last-child { color: #58a9ff; }
+
+.container {
+  max-width: 1050px;
+  padding: 30px 18px 70px;
+  margin: auto;
+}
+
+.intro {
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  margin: 0 0 24px;
+}
+
+.edit-notice {
+  display: none;
+  background: #fff5e3;
+  color: #89520b;
+  border: 1px solid #f0d39d;
+  padding: 12px 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+body.editing .edit-notice { display: block; }
+
+details.section {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  margin-bottom: 14px;
+  overflow: hidden;
+  box-shadow: 0 3px 12px #1a2b4410;
+}
+
+details.section > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 17px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-weight: 800;
+  font-size: 15px;
+  user-select: none;
+}
+
+details.section > summary::-webkit-details-marker { display: none; }
+
+details.section > summary::after {
+  content: "+";
+  margin-left: auto;
+  font-size: 23px;
+  color: #8792a3;
+  font-weight: 400;
+}
+
+details.section[open] > summary::after { content: "−"; }
+
+.section-number {
+  background: #eef2f8;
+  color: #53647c;
+  border-radius: 7px;
+  min-width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.section-content {
+  padding: 5px 24px 25px;
+  border-top: 1px solid var(--line);
+  font-size: 16px;
+}
+
+h3 {
+  font-size: 17px;
+  margin: 23px 0 12px;
+  color: #25344a;
+}
+
+h4 {
+  font-size: 15px;
+  margin: 20px 0 9px;
+  color: #45536a;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+p { margin: 10px 0; }
+
+ul {
+  padding-left: 22px;
+  margin: 9px 0 15px;
+}
+
+li { margin: 5px 0; }
+
+strong { color: #192b43; }
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 12px 0 20px;
+  font-size: 15px;
+  text-align: left;
+}
+
+th {
+  background: #eef2f8;
+  color: #35445a;
+  font-weight: 800;
+}
+
+th, td {
+  border: 1px solid var(--line);
+  padding: 9px 12px;
+}
+
+tbody tr:nth-child(even) { background: #f8fafd; }
+
+.team-table th:first-child,
+.team-table td:first-child { width: 55px; text-align: center; }
+
+.team-red {
+  color: var(--red-dark);
+  background: #fff0f2 !important;
+}
+
+.team-blue {
+  color: var(--blue-dark);
+  background: #edf5ff !important;
+}
+
+.event-table th:first-child,
+.event-table td:first-child { width: 50%; }
+
+.callout {
+  background: #f2f6fb;
+  border-left: 4px solid #6e8db8;
+  padding: 12px 15px;
+  margin: 16px 0;
+  border-radius: 0 7px 7px 0;
+}
+
+.callout.red {
+  background: #fff2f4;
+  border-color: var(--red);
+}
+
+.callout.blue {
+  background: #eff6ff;
+  border-color: var(--blue);
+}
+
+.callout.warning {
+  background: #fff8e9;
+  border-color: #e4a52e;
+}
+
+.team-label {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  margin-top: 10px;
+}
+
+.team-label.red {
+  color: var(--red-dark);
+  background: #ffe7eb;
+}
+
+.team-label.blue {
+  color: var(--blue-dark);
+  background: #e5f1ff;
+}
+
+.time {
+  font-size: 17px;
+  font-weight: 800;
+  color: #152a47;
+}
+
+.volunteer-heading {
+  background: linear-gradient(100deg,#a91f36,#1676dc);
+  color: white;
+  padding: 25px;
+  border-radius: 12px;
+  margin: 30px 0 15px;
+  text-align: center;
+}
+
+.volunteer-heading h2 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 28px;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+.volunteer-heading p {
+  font-size: 12px;
+  margin-bottom: 0;
+  color: #ffffffdc;
+}
+
+.footer {
+  background: #101a2a;
+  color: white;
+  text-align: center;
+  padding: 30px 15px;
+}
+
+.footer strong {
+  color: white;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 22px;
+  letter-spacing: 2px;
+}
+
+.footer p {
+  font-size: 12px;
+  color: #aab7c9;
+  letter-spacing: 2px;
+}
+
+[contenteditable="true"] {
+  outline: 2px dashed #e4a52e;
+  outline-offset: 3px;
+  border-radius: 3px;
+  cursor: text;
+}
+
+@media(max-width:600px) {
+  .topbar { padding: 10px 12px; }
+  .brand { font-size: 11px; }
+  .toolbar { gap: 5px; }
+  .btn { padding: 7px 9px; font-size: 11px; }
+  .hero { padding: 48px 12px 40px; }
+  .hero .tagline { font-size: 20px; }
+  .container { padding: 20px 10px 45px; }
+  details.section > summary { padding: 14px 12px; font-size: 14px; }
+  .section-content { padding: 5px 13px 20px; font-size: 15px; }
+  h3 { font-size: 16px; }
+  h4 { font-size: 14px; }
+  table { font-size: 13px; }
+  th,td { padding: 7px 6px; }
+}
+
+@media print {
+  @page { size: A4; margin: 13mm; }
+
+  body { background: white; font-size: 11px; }
+  .topbar { display: none !important; }
+  .hero {
+    padding: 25px 10px;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .hero h1 { font-size: 42px; }
+  .hero .tagline { font-size: 18px; }
+  .container { padding: 15px 0; max-width: none; }
+  .intro, .edit-notice { display: none !important; }
+  details.section {
+    box-shadow: none;
+    border: 1px solid #dce1e8;
+    break-inside: auto;
+    margin-bottom: 9px;
+  }
+  details.section > summary {
+    padding: 10px 12px;
+    break-after: avoid;
+  }
+  details.section > summary::after { display: none; }
+  details.section > .section-content { display: block !important; }
+  .section-content { padding: 5px 13px 14px; }
+  h3, h4 { break-after: avoid; }
+  tr { break-inside: avoid; }
+  table { font-size: 10px; }
+  th,td { padding: 5px 7px; }
+  .footer {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .volunteer-heading {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+  <div class="brand">COACH ANDREW'S <span>STACKING LEAGUE</span></div>
+  <div class="toolbar">
+    <button class="btn" onclick="toggleSections()">Expand / Collapse</button>
+    <button class="btn editing" id="editBtn" onclick="toggleEdit()">✎ Edit Mode</button>
+    <button class="btn" onclick="resetPage()">Reset</button>
+    <button class="btn print" onclick="window.print()">Print / PDF</button>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="eyebrow">PARENTS & PARTICIPANTS GUIDE</div>
+  <h1><span class="red">COACH ANDREW'S</span><br><span class="blue">STACKING LEAGUE</span></h1>
+  <div class="subtitle">Performance Night Blueprint</div>
+  <div class="tagline"><span>TWO TEAMS.</span> <span>ONE MISSION.</span></div>
+</header>
+
+<main class="container" id="blueprint">
+
+<p class="intro">Please read through the arrangements carefully and keep this guide handy throughout the evening.</p>
+
+<div class="edit-notice">
+  EDIT MODE IS ON — Click any text or table cell to make changes. Changes are temporary and will be lost when the page is refreshed.
+</div>
+
+<!-- SECTION 1 -->
+<details class="section" open>
+<summary><span class="section-number">01</span> WHAT TO BRING</summary>
+<div class="section-content">
+<p>Please make sure your child brings the following:</p>
+<ul>
+<li>Red Team Jersey</li>
+<li>Blue Team Jersey</li>
+<li>Personal Sport Stacking Equipment (cups, mat and timer)</li>
+<li>Water Bottle</li>
+</ul>
+<div class="callout red"><strong>Important:</strong> Please bring BOTH team jerseys. Children may need to switch team colours during the performance.</div>
+</div>
+</details>
+
+<!-- SECTION 2 -->
+<details class="section" open>
+<summary><span class="section-number">02</span> DRESS CODE & DEFAULT TEAM ALLOCATION</summary>
+<div class="section-content">
+<p>Children may wear their default team colour when arriving.</p>
+<p>Please refer to the following default team allocation:</p>
+
+<h3><span class="team-label red">RED TEAM</span></h3>
+<table class="team-table">
+<thead><tr><th>No.</th><th>Short Name</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>MIK</td></tr>
+<tr><td>2</td><td>ZOE</td></tr>
+<tr><td>3</td><td>JAR</td></tr>
+<tr><td>4</td><td>LSW</td></tr>
+<tr><td>5</td><td>LOU</td></tr>
+<tr><td>6</td><td>TYY</td></tr>
+<tr><td>7</td><td>MAT</td></tr>
+</tbody>
+</table>
+
+<h3><span class="team-label blue">BLUE TEAM</span></h3>
+<table class="team-table">
+<thead><tr><th>No.</th><th>Short Name</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>FGM</td></tr>
+<tr><td>2</td><td>HNH</td></tr>
+<tr><td>3</td><td>LRK</td></tr>
+<tr><td>4</td><td>GER</td></tr>
+<tr><td>5</td><td>STE</td></tr>
+<tr><td>6</td><td>EEN</td></tr>
+<tr><td>7</td><td>MIN</td></tr>
+</tbody>
+</table>
+
+<h3>Important Reminders</h3>
+<ul>
+<li>Wear your default team jersey when arriving.</li>
+<li>Bring BOTH red and blue jerseys.</li>
+<li>Be prepared to switch team colours at short notice when instructed.</li>
+</ul>
+</div>
+</details>
+
+<!-- SECTION 3 -->
+<details class="section" open>
+<summary><span class="section-number">03</span> EVENT ARRANGEMENT</summary>
+<div class="section-content">
+<p>The following is the sequence of events for the performance.</p>
+
+<h3>EVENT 1 – HTH 3-6-3 RELAY</h3>
+<table class="event-table">
+<thead><tr><th class="team-red">RED TEAM</th><th class="team-blue">BLUE TEAM</th></tr></thead>
+<tbody><tr><td>MIK</td><td>FGM</td></tr><tr><td>ZOE</td><td>HNH</td></tr><tr><td>JAR</td><td>LRK</td></tr><tr><td>LSW</td><td>GER</td></tr></tbody>
+</table>
+
+<h3>EVENT 2 – INDIVIDUAL 3-3-3</h3>
+<table class="event-table">
+<thead><tr><th class="team-red">RED TEAM</th><th class="team-blue">BLUE TEAM</th></tr></thead>
+<tbody><tr><td>ZOE</td><td>HNH</td></tr></tbody>
+</table>
+
+<h3>EVENT 3 – INDIVIDUAL 3-3-3</h3>
+<table class="event-table">
+<thead><tr><th class="team-red">RED TEAM</th><th class="team-blue">BLUE TEAM</th></tr></thead>
+<tbody><tr><td>LOU</td><td>GER (EEN – Substitute)</td></tr></tbody>
+</table>
+
+<h3>EVENT 4 – INDIVIDUAL 3-6-3</h3>
+<table class="event-table">
+<thead><tr><th class="team-red">RED TEAM</th><th class="team-blue">BLUE TEAM</th></tr></thead>
+<tbody><tr><td>JAR</td><td>FGM</td></tr></tbody>
+</table>
+
+<h3>EVENT 5 – DOUBLES CYCLE</h3>
+<table class="event-table">
+<thead><tr><th class="team-red">RED TEAM</th><th class="team-blue">BLUE TEAM</th></tr></thead>
+<tbody><tr><td>TYY & LOU</td><td>STE & MIN</td></tr></tbody>
+</table>
+
+<h3>EVENT 6 – INDIVIDUAL CYCLE</h3>
+<table class="event-table">
+<thead><tr><th class="team-red">RED TEAM</th><th class="team-blue">BLUE TEAM</th></tr></thead>
+<tbody><tr><td>TYY</td><td>STE</td></tr></tbody>
+</table>
+
+<h3>EVENT 7 – HTH CYCLE RELAY</h3>
+<table class="event-table">
+<thead><tr><th class="team-red">RED TEAM</th><th class="team-blue">BLUE TEAM</th></tr></thead>
+<tbody><tr><td>TYY, MAT, LSW, LOU</td><td>STE, EEN, MIN, GER</td></tr></tbody>
+</table>
+</div>
+</details>
+
+<!-- SECTION 4 -->
+<details class="section" open>
+<summary><span class="section-number">04</span> RELAY RUNNING ORDER</summary>
+<div class="section-content">
+<p>The following sequences indicate who goes first, second, third and fourth in each relay.</p>
+
+<h3>EVENT 1 – HTH 3-6-3 RELAY</h3>
+
+<h4><span class="team-label red">RED TEAM</span></h4>
+<table>
+<thead><tr><th>Order</th><th>Participant</th></tr></thead>
+<tbody>
+<tr><td>1st</td><td>ZOE</td></tr>
+<tr><td>2nd</td><td>JAR</td></tr>
+<tr><td>3rd</td><td>MIK</td></tr>
+<tr><td>4th</td><td>LSW</td></tr>
+</tbody>
+</table>
+
+<h4><span class="team-label blue">BLUE TEAM</span></h4>
+<table>
+<thead><tr><th>Order</th><th>Participant</th></tr></thead>
+<tbody>
+<tr><td>1st</td><td>HNH</td></tr>
+<tr><td>2nd</td><td>FGM</td></tr>
+<tr><td>3rd</td><td>LRK</td></tr>
+<tr><td>4th</td><td>GER</td></tr>
+</tbody>
+</table>
+
+<h3>EVENT 7 – HTH CYCLE RELAY</h3>
+
+<h4><span class="team-label red">RED TEAM</span></h4>
+<table>
+<thead><tr><th>Order</th><th>Participant</th></tr></thead>
+<tbody>
+<tr><td>1st</td><td>MAT</td></tr>
+<tr><td>2nd</td><td>LOU</td></tr>
+<tr><td>3rd</td><td>LSW</td></tr>
+<tr><td>4th</td><td>TYY</td></tr>
+</tbody>
+</table>
+
+<h4><span class="team-label blue">BLUE TEAM</span></h4>
+<table>
+<thead><tr><th>Order</th><th>Participant</th></tr></thead>
+<tbody>
+<tr><td>1st</td><td>EEN</td></tr>
+<tr><td>2nd</td><td>GER</td></tr>
+<tr><td>3rd</td><td>MIN</td></tr>
+<tr><td>4th</td><td>STE</td></tr>
+</tbody>
+</table>
+
+<div class="callout warning"><strong>Important:</strong> All may be subject to changes.</div>
+</div>
+</details>
+
+<!-- SECTION 5 -->
+<details class="section" open>
+<summary><span class="section-number">05</span> ARRIVAL TIME & INITIAL REHEARSAL</summary>
+<div class="section-content">
+<p class="time">Preferred Arrival Time: 4:00 PM</p>
+<p>We strongly encourage all participants to arrive by 4:00 PM for an initial rehearsal before the performance.</p>
+
+<p>This will allow the children to:</p>
+<ul>
+<li>Familiarise themselves with the performance arrangements.</li>
+<li>Practise their event sequences and relay handovers.</li>
+<li>Understand where to stand and when to get ready.</li>
+<li>Make any necessary last-minute adjustments.</li>
+</ul>
+
+<h3>For Those Unable to Arrive at 4:00 PM</h3>
+<p>No worries! Please arrive as early as possible and inform Coach Andrew in advance. We will help you catch up with the necessary arrangements.</p>
+
+<h3>Final Rehearsal Before the Live Performance</h3>
+<p>When Coach Andrew arrives at Puay Chai, if time permits, we will have one final rehearsal before proceeding with the live performance.</p>
+<ul>
+<li>All children, volunteer parents and the assistant coach should be ready and available when Coach Andrew arrives.</li>
+<li>Please be prepared to go through the final performance arrangements, including event sequences, relay handovers and stage arrangements.</li>
+<li>We will use this opportunity to make sure everyone understands their respective responsibilities before the actual performance begins.</li>
+</ul>
+
+<div class="callout warning"><strong>Important:</strong> Please do not wait until Coach Andrew arrives to start getting ready. Everyone should be prepared in advance so that we can make full use of the remaining time.</div>
+</div>
+</details>
+
+<!-- SECTION 6 -->
+<details class="section" open>
+<summary><span class="section-number">06</span> FOOD & MAKE-UP ARRANGEMENTS</summary>
+<div class="section-content">
+<p class="time">5:30 PM – Food Provided by School</p>
+<ul>
+<li>Food provided by the school is expected to be ready at 5:30 PM.</li>
+<li>Children will have their food before proceeding with make-up.</li>
+<li>After eating, the children will take turns going for make-up by the teacher.</li>
+<li>Please arrive with a clean face and avoid applying make-up beforehand.</li>
+</ul>
+</div>
+</details>
+
+<!-- SECTION 7 -->
+<details class="section" open>
+<summary><span class="section-number">07</span> STACKING EQUIPMENT ARRANGEMENT</summary>
+<div class="section-content">
+<h3>For the Actual Performance</h3>
+<p>Only <strong>TWO sets</strong> of stacking equipment will be used throughout the actual performance.</p>
+<p>The two designated sets will tentatively belong to:</p>
+<ul>
+<li><strong>TYY</strong></li>
+<li><strong>MIN</strong></li>
+</ul>
+<div class="callout red"><strong>Important:</strong> Participants must remember whose cups are designated for the actual performance. The children themselves must remember to bring these two sets onto the stage when required.</div>
+
+<h3>For Warming Up</h3>
+<p>All other participants must still bring their own stacking equipment.</p>
+<p>Their personal equipment will be used for warming up and practice before the performance.</p>
+</div>
+</details>
+
+<!-- SECTION 8 -->
+<details class="section" open>
+<summary><span class="section-number">08</span> MEETING POINT & CLASSROOM ARRANGEMENTS</summary>
+<div class="section-content">
+<p class="time">Our Designated Room: CLASSROOM 3A</p>
+<p>Classroom 3A will be our main meeting point throughout the evening.</p>
+<p>This is where we will:</p>
+<ul>
+<li>Gather upon arrival.</li>
+<li>Conduct our initial rehearsal.</li>
+<li>Have our food.</li>
+<li>Wait for our turns to go for make-up.</li>
+</ul>
+<p>Please remain in Classroom 3A and wait for your turn to be arranged for make-up by the teacher.</p>
+
+<h3>Important Reminders for Volunteer Parents</h3>
+<p>We would appreciate our volunteer parents' help in keeping an eye on the children throughout the evening.</p>
+
+<h4>Toilet Breaks</h4>
+<ul>
+<li>Please ensure children return promptly after using the toilet.</li>
+<li>Kindly discourage children from using toilet breaks as an excuse to wander around the school or disappear from the group.</li>
+</ul>
+
+<h4>Children Watching the Performance on the Projector</h4>
+<ul>
+<li>Children who choose to go downstairs to watch the projector must remain in the designated viewing area.</li>
+<li>They must not wander around elsewhere.</li>
+<li>If they need to leave the viewing area, please inform a volunteer parent.</li>
+<li>Coach Andrew may need to locate them urgently when their events are coming up.</li>
+</ul>
+
+<div class="callout red"><strong>Important:</strong> We need to know where every child is at all times so that nobody goes missing when it is time to perform!</div>
+</div>
+</details>
+
+<!-- SECTION 9 -->
+<details class="section" open>
+<summary><span class="section-number">09</span> COACH ANDREW'S ARRIVAL & PERFORMANCE TIME</summary>
+<div class="section-content">
+<p>Coach Andrew will first be attending the performance at <strong>SJK(C) Subang</strong> before rushing back to <strong>SJK(C) Puay Chai</strong>.</p>
+
+<table>
+<tbody>
+<tr><td><strong>Expected arrival at Puay Chai</strong></td><td class="time">8:15 PM</td></tr>
+<tr><td><strong>Possible delayed arrival</strong></td><td>8:30 PM, 8:40 PM or even later</td></tr>
+<tr><td><strong>Estimated Puay Chai Stacking Performance Time</strong></td><td class="time">9:05 PM</td></tr>
+</tbody>
+</table>
+
+<p>Please be prepared for the possibility that Coach Andrew may arrive later than 8:40 PM. We will need everyone's cooperation and flexibility to manage the arrangements accordingly.</p>
+
+<p>Hopefully, everything will run smoothly tomorrow!</p>
+</div>
+</details>
+
+<!-- VOLUNTEER PARENTS DIVIDER -->
+<div class="volunteer-heading">
+<h2>FOR VOLUNTEER PARENTS ONLY</h2>
+<p>The following two sections contain additional duties and arrangements specifically for volunteer parents. Parents who are not volunteering may skip these sections.</p>
+</div>
+
+<!-- SECTION 10 -->
+<details class="section" open>
+<summary><span class="section-number">10</span> VOLUNTEER PARENTS' DUTIES & ARRANGEMENTS</summary>
+<div class="section-content">
+<p>We sincerely appreciate the help and cooperation of our volunteer parents. Your assistance will be very important in ensuring that everything runs smoothly throughout the performance.</p>
+
+<h3>1. Line Judges & Stage Assistance</h3>
+<ul>
+<li>Volunteer parents are welcome to be on stage as line judges and help manage the children's performances.</li>
+<li>Line judges can also help ensure that children waiting backstage remain seated and do not dance or move around unnecessarily, as this happened during the rehearsal.</li>
+<li>If possible, line judges are encouraged to wear the same colour for a more coordinated appearance. This is not compulsory.</li>
+</ul>
+
+<h3>2. Live Score Updates</h3>
+<ul>
+<li>One volunteer parent will be in charge of updating the scores on the live scoreboard displayed on the digital backdrop.</li>
+<li>This person will need to keep the scores updated throughout the performance.</li>
+</ul>
+
+<h3>3. Tournament Display Setup</h3>
+<ul>
+<li>Two volunteer parents will be in charge of setting up the tournament display before the performance.</li>
+<li>They must ensure that the display is positioned correctly.</li>
+<li>The assistant coach can help check and confirm the positioning.</li>
+</ul>
+
+<h3>4. Stage Table Arrangement</h3>
+<ul>
+<li>At <strong>3:30 PM tomorrow</strong>, Coach Andrew will make sure the stage marker is in place.</li>
+<li>Volunteer parents can then help ensure that the tables are positioned correctly according to the marker.</li>
+<li>Please ensure that the tables are properly aligned before the children begin their performances.</li>
+</ul>
+
+<h3>5. Designated Stacking Equipment</h3>
+<ul>
+<li>A volunteer parent can help ensure that TYY's and MIN's designated stacking equipment is brought onto the stage when required.</li>
+<li>Please help remind the children to bring the correct equipment onto the stage at the appropriate time.</li>
+</ul>
+
+<h3>6. Backstage Coordination & Display Setup</h3>
+<ul>
+<li>A volunteer parent can help check with the backstage team regarding the performance arrangements and readiness.</li>
+<li>Please help ensure that we have sufficient time to set up the tournament display before our performance begins.</li>
+<li>Keep track of the backstage situation and inform Coach Andrew if there are any updates or potential delays.</li>
+<li>If necessary, help coordinate with the assistant coach to ensure the display is properly set up and ready before the children go on stage.</li>
+</ul>
+</div>
+</details>
+
+<!-- SECTION 11 -->
+<details class="section" open>
+<summary><span class="section-number">11</span> LIVE PERFORMANCE UPDATES</summary>
+<div class="section-content">
+<h3>Assistance from Volunteer Parents / Assistant Coach</h3>
+<p>We would appreciate it if one of the volunteer parents or the assistant coach could help keep track of the performance progress at Puay Chai.</p>
+<ul>
+<li>Monitor the performance flow and keep track of which events have been completed and which are coming up.</li>
+<li>Update Coach Andrew regularly via WhatsApp on the actual progress.</li>
+<li>Inform Coach Andrew immediately if there are any delays or changes to the performance schedule.</li>
+</ul>
+
+<h3>Why Is This Important?</h3>
+<p>As Coach Andrew will be travelling from SJK(C) Subang to SJK(C) Puay Chai, live updates will help him estimate how much time he has while travelling.</p>
+
+<p>In fact, <strong>if there are delays at Puay Chai, that's actually a good thing for Coach Andrew! 😂</strong></p>
+
+<p>It means he has a little more breathing room and doesn't have to rush back like crazy from Subang.</p>
+
+<p>Hopefully, everything goes smoothly, but a little extra time would certainly be helpful!</p>
+</div>
+</details>
+
+</main>
+
+<footer class="footer">
+<strong>THANK YOU, EVERYONE, FOR YOUR COOPERATION!</strong>
+<p>Let's work together to make COACH ANDREW'S STACKING LEAGUE a memorable performance night!</p>
+<p><span style="color:#ff526b">TWO TEAMS.</span> <span style="color:#58a9ff">ONE MISSION.</span></p>
+</footer>
+
+<script>
+let editMode = false;
+
+function toggleEdit() {
+  editMode = !editMode;
+  document.body.classList.toggle("editing", editMode);
+
+  const blueprint = document.getElementById("blueprint");
+  blueprint.contentEditable = editMode ? "true" : "false";
+
+  document.getElementById("editBtn").textContent =
+    editMode ? "✓ Finish Editing" : "✎ Edit Mode";
+
+  document.getElementById("editBtn").classList.toggle("editing", editMode);
+}
+
+function toggleSections() {
+  const sections = document.querySelectorAll("details.section");
+  const allOpen = [...sections].every(s => s.open);
+  sections.forEach(s => s.open = !allOpen);
+}
+
+function resetPage() {
+  if (confirm("Restore the original blueprint? All temporary edits will be lost.")) {
+    location.reload();
+  }
+}
+</script>
+
+</body>
+</html>
